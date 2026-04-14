@@ -34,6 +34,8 @@ h1 {
   height: 450px;
   border-radius: 50%;
   box-shadow: 0 0 40px rgba(0,212,255,0.3);
+  margin: auto;
+  background: radial-gradient(circle, rgba(0,212,255,0.05), transparent);
 }
 
 .letra {
@@ -48,6 +50,7 @@ h1 {
   font-weight: bold;
   box-shadow: 0 0 10px rgba(0,212,255,0.6);
   transition: 0.3s;
+  border: 2px solid rgba(255,255,255,0.2);
 }
 
 .letra.activa {
@@ -152,11 +155,12 @@ let intervalo;
 
 const rosco = document.getElementById("rosco");
 const radio = 180;
+const centro = 225;
 
 preguntas.forEach((p, i) => {
-  const angle = (i / preguntas.length) * 2 * Math.PI;
-  const x = 225 + radio * Math.cos(angle) - 21;
-  const y = 225 + radio * Math.sin(angle) - 21;
+  const angle = (i / preguntas.length) * 2 * Math.PI - Math.PI / 2; // empieza arriba
+  const x = centro + radio * Math.cos(angle) - 21;
+  const y = centro + radio * Math.sin(angle) - 21;
 
   const div = document.createElement("div");
   div.className = "letra";
