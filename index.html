@@ -32,7 +32,6 @@ h1 {
   width: 450px;
   height: 450px;
   border-radius: 50%;
-  margin: auto;
 }
 
 .letra {
@@ -48,16 +47,16 @@ h1 {
   transition: 0.3s;
 }
 
-.activa { transform: scale(1.2); box-shadow: 0 0 15px yellow; }
+.activa {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px yellow;
+}
+
 .correcta { background: green !important; }
 .incorrecta { background: red !important; }
 
 #panel {
   width: 300px;
-}
-
-#pregunta {
-  margin-bottom: 15px;
 }
 
 input {
@@ -100,44 +99,43 @@ button {
 document.addEventListener("DOMContentLoaded", () => {
 
 const preguntas = [
-{letra:"A", respuesta:"acuerdos", pregunta:"Empieza con A: Operaciones comerciales", estado:0},
-{letra:"B", respuesta:"bienes", pregunta:"Empieza con B: Productos y servicios", estado:0},
-{letra:"C", respuesta:"canal", pregunta:"Empieza con C: Lleva el producto al consumidor", estado:0},
-{letra:"D", respuesta:"demanda", pregunta:"Empieza con D: El canal la satisface", estado:0},
-{letra:"E", respuesta:"entorno", pregunta:"Empieza con E: Factores externos", estado:0},
-{letra:"F", respuesta:"forma", pregunta:"Empieza con F: Estado del producto", estado:0},
-{letra:"G", respuesta:"gestion", pregunta:"Empieza con G: Administración", estado:0},
-{letra:"H", respuesta:"hipermercados", pregunta:"Empieza con H: Grandes tiendas", estado:0},
-{letra:"I", respuesta:"interorganizacional", pregunta:"Empieza con I: Relación entre empresas", estado:0},
-{letra:"J", respuesta:"conjunto", pregunta:"Contiene la J: Grupo de elementos", estado:0},
-{letra:"L", respuesta:"logistica", pregunta:"Empieza con L: Movimiento de productos", estado:0},
-{letra:"M", respuesta:"macroambientales", pregunta:"Empieza con M: Factores externos", estado:0},
-{letra:"N", respuesta:"nacionales", pregunta:"Empieza con N: Factores del país", estado:0},
-{letra:"Ñ", respuesta:"mañana", pregunta:"Contiene la Ñ: Momento del día", estado:0},
-{letra:"O", respuesta:"objetivos", pregunta:"Empieza con O: Metas", estado:0},
-{letra:"P", respuesta:"poder", pregunta:"Empieza con P: Influencia", estado:0},
-{letra:"Q", respuesta:"quiere", pregunta:"Contiene la Q: Lo que busca lograr", estado:0},
-{letra:"R", respuesta:"rentabilidad", pregunta:"Empieza con R: Ganancia", estado:0},
-{letra:"S", respuesta:"sistema", pregunta:"Empieza con S: Conjunto organizado", estado:0},
-{letra:"T", respuesta:"tiempo", pregunta:"Empieza con T: Valor si llega tarde", estado:0},
-{letra:"U", respuesta:"unidad", pregunta:"Empieza con U: Espacio promocional", estado:0},
-{letra:"V", respuesta:"ventaja", pregunta:"Empieza con V: Beneficio", estado:0},
-{letra:"X", respuesta:"mix", pregunta:"Contiene la X: Estrategia", estado:0},
-{letra:"Y", respuesta:"mayor", pregunta:"Contiene la Y: Más atención", estado:0},
-{letra:"Z", respuesta:"organizacion", pregunta:"Contiene la Z: Grupo de personas", estado:0}
+  {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A: Mensaje publicitario para vender algo", estado:0},
+  {letra:"B", respuesta:"barato", pregunta:"Empieza con B: Producto que tiene un precio bajo", estado:0},
+  {letra:"C", respuesta:"cliente", pregunta:"Empieza con C: Persona que compra un producto", estado:0},
+  {letra:"D", respuesta:"descuento", pregunta:"Empieza con D: Rebaja en el precio de un artículo", estado:0},
+  {letra:"E", respuesta:"envase", pregunta:"Empieza con E: Recipiente que protege al producto", estado:0},
+  {letra:"F", respuesta:"fabrica", pregunta:"Empieza con F: Lugar donde se hacen los productos", estado:0},
+  {letra:"G", respuesta:"gratis", pregunta:"Empieza con G: Algo que no cuesta dinero", estado:0},
+  {letra:"H", respuesta:"horario", pregunta:"Empieza con H: Tiempo en que una tienda está abierta", estado:0},
+  {letra:"I", respuesta:"internet", pregunta:"Empieza con I: Red para comprar de forma online", estado:0},
+  {letra:"J", respuesta:"tarjeta", pregunta:"Contiene la J: Objeto de plástico para pagar sin efectivo", estado:0},
+  {letra:"L", respuesta:"logotipo", pregunta:"Empieza con L: Dibujo que representa a una marca", estado:0},
+  {letra:"M", respuesta:"mercado", pregunta:"Empieza con M: Lugar físico o virtual de compra y venta", estado:0},
+  {letra:"N", respuesta:"negocio", pregunta:"Empieza con N: Local comercial o tienda", estado:0},
+  {letra:"Ñ", respuesta:"tamaño", pregunta:"Contiene la Ñ: Medida de un producto (pequeño, grande...)", estado:0},
+  {letra:"O", respuesta:"oferta", pregunta:"Empieza con O: Promoción especial para atraer compradores", estado:0},
+  {letra:"P", respuesta:"precio", pregunta:"Empieza con P: Valor en dinero de una cosa", estado:0},
+  {letra:"Q", respuesta:"etiqueta", pregunta:"Contiene la Q: Papel pegado al producto con información o precio", estado:0},
+  {letra:"R", respuesta:"regalo", pregunta:"Empieza con R: Obsequio que se da al cliente", estado:0},
+  {letra:"S", respuesta:"servicio", pregunta:"Empieza con S: Lo que se ofrece y no es un objeto físico", estado:0},
+  {letra:"T", respuesta:"tienda", pregunta:"Empieza con T: Establecimiento donde se venden cosas", estado:0},
+  {letra:"U", respuesta:"usar", pregunta:"Empieza con U: Utilizar un producto después de comprarlo", estado:0},
+  {letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Persona que entrega el producto por dinero", estado:0},
+  {letra:"X", respuesta:"exito", pregunta:"Contiene la X: Cuando a un producto le va muy bien", estado:0},
+  {letra:"Y", respuesta:"ayuda", pregunta:"Contiene la Y: Lo que pides al servicio de atención al cliente", estado:0},
+  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Tienda donde se compran calzados", estado:0}
 ];
-
 let actual = 0;
+let tiempo = 120;
+let intervalo;
 
-// 🎯 CREAR ROSCO
+// 🎯 Crear rosco
 const rosco = document.getElementById("rosco");
-
 const radio = 180;
 const centro = 225;
 
 preguntas.forEach((p, i) => {
   const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
-
   const x = centro + radio * Math.cos(angulo) - 21;
   const y = centro + radio * Math.sin(angulo) - 21;
 
@@ -151,12 +149,21 @@ preguntas.forEach((p, i) => {
   rosco.appendChild(div);
 });
 
-// TEST (si ves esto en consola, funciona)
-console.log("ROSCO CREADO");
-
-// resto lógica mínima
+// UI
 function actualizarUI() {
+  document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
+  document.getElementById("letra-" + actual).classList.add("activa");
   document.getElementById("pregunta").innerText = preguntas[actual].pregunta;
+}
+
+// lógica
+function siguiente() {
+  let vueltas = 0;
+  do {
+    actual = (actual + 1) % preguntas.length;
+    vueltas++;
+  } while (preguntas[actual].estado !== 0 && vueltas < preguntas.length);
+  actualizarUI();
 }
 
 window.responder = function() {
@@ -164,28 +171,74 @@ window.responder = function() {
   const resp = input.value.toLowerCase().trim();
   if (!resp) return;
 
+  const p = preguntas[actual];
   const letra = document.getElementById("letra-" + actual);
 
-  if (resp === preguntas[actual].respuesta) {
+  if (resp === p.respuesta) {
     letra.classList.add("correcta");
+    p.estado = 1;
   } else {
     letra.classList.add("incorrecta");
+    p.estado = -1;
   }
 
-  actual = (actual + 1) % preguntas.length;
   input.value = "";
-  actualizarUI();
+
+  // terminar si ya respondió todo
+  if (preguntas.every(p => p.estado !== 0)) {
+    clearInterval(intervalo);
+    finalizarJuego();
+    return;
+  }
+
+  siguiente();
 };
 
 window.pasar = function() {
-  actual = (actual + 1) % preguntas.length;
-  actualizarUI();
+  siguiente();
 };
 
-actualizarUI();
-
+// teclado
+document.addEventListener("keydown", function(e){
+  if(e.key === "Enter") responder();
+  if(e.code === "Space"){
+    e.preventDefault();
+    pasar();
+  }
 });
 
+// ⏱️ timer REAL
+function iniciarTimer(){
+  intervalo = setInterval(() => {
+    tiempo--;
+    document.getElementById("timer").innerText = "⏱️ " + tiempo + "s";
+
+    if (tiempo <= 0) {
+      clearInterval(intervalo);
+      finalizarJuego();
+    }
+  }, 1000);
+}
+
+// 🏁 final
+function finalizarJuego(){
+  let correctas = preguntas.filter(p => p.estado === 1).length;
+  let incorrectas = preguntas.filter(p => p.estado === -1).length;
+
+  alert(
+    "🏁 FIN DEL JUEGO\n\n" +
+    "✅ Correctas: " + correctas + "\n" +
+    "❌ Incorrectas: " + incorrectas
+  );
+
+  location.reload();
+}
+
+// iniciar
+actualizarUI();
+iniciarTimer();
+
+});
 </script>
 
 </body>
