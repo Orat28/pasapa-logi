@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Pasapalabra PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at center, #001f3f, #000814);
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  margin-top: 10px;
+  color: #00d4ff;
+  text-shadow: 0 0 10px #00d4ff;
+}
+
+#game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  margin-top: 20px;
+}
+
+#rosco {
+  position: relative;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  box-shadow: 0 0 40px rgba(0,212,255,0.3);
+}
+
+.letra {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #007bff, #00d4ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(0,212,255,0.6);
+  transition: 0.3s;
+}
+
+.letra.activa {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px yellow;
+}
+
+.correcta { background: #00c853 !important; }
+.incorrecta { background: #ff1744 !important; }
+
+#panel {
+  width: 350px;
+}
+
+#pregunta {
+  font-size: 18px;
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.05);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+input {
+  padding: 12px;
+  width: 90%;
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-ok { background: #00c853; }
+.btn-pass { background: #ff9100; }
+
+#score {
+  margin-top: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🎮 PASAPALABRA PRO</h1>
+
+<div id="game">
+
+<div id="rosco"></div>
+
+<div id="panel">
+  <div id="pregunta"></div>
+  <input type="text" id="respuesta" placeholder="Tu respuesta..." onkeydown="if(event.key==='Enter'){responder()}" autofocus>
+  <br>
+  <button class="btn-ok" onclick="responder()">Responder</button>
+  <button class="btn-pass" onclick="pasar()">Pasar</button>
+  <div id="score"></div>
+  <div id="timer" style="margin-top:10px;font-size:20px;color:#00d4ff"></div>
+</div>
+
+</div>
+
+<script>
+const preguntas = [
+  {letra:"A", respuesta:"acuerdos", pregunta:"Operaciones necesarias para cerrar acciones comerciales", estado:0},
+  {letra:"B", respuesta:"bienes", pregunta:"Productos y servicios distribuidos", estado:0},
+  {letra:"C", respuesta:"canal", pregunta:"Conjunto que lleva el producto al consumidor", estado:0},
+  {letra:"D", respuesta:"demanda", pregunta:"El canal la satisface y estimula", estado:0},
+  {letra:"E", respuesta:"entorno", pregunta:"Fuerzas externas que afectan decisiones", estado:0},
+  {letra:"F", respuesta:"forma", pregunta:"Falla si el producto llega en mal estado", estado:0},
+  {letra:"G", respuesta:"gestion", pregunta:"Define objetivos y estrategias", estado:0},
+  {letra:"H", respuesta:"hipermercados", pregunta:"Grandes cadenas minoristas", estado:0},
+  {letra:"I", respuesta:"interorganizacional", pregunta:"Participación de varias organizaciones", estado:0},
+  {letra:"J", respuesta:"conjunto", pregunta:"Contiene la J: Grupo de actividades y personas", estado:0},
+  {letra:"L", respuesta:"logistica", pregunta:"Movimiento físico de mercadería", estado:0},
+  {letra:"M", respuesta:"macroambientales", pregunta:"Factores externos", estado:0},
+  {letra:"N", respuesta:"nacionales", pregunta:"Factores del país", estado:0},
+  {letra:"Ñ", respuesta:"mañana", pregunta:"Si no llega a tiempo pierde valor", estado:0},
+  {letra:"O", respuesta:"objetivos", pregunta:"Metas de distribución", estado:0},
+  {letra:"P", respuesta:"poder", pregunta:"Capacidad de influencia", estado:0},
+  {letra:"Q", respuesta:"quiere", pregunta:"Contiene la Q: Lo que busca lograr la empresa", estado:0},
+  {letra:"R", respuesta:"rentabilidad", pregunta:"Objetivo financiero", estado:0},
+  {letra:"S", respuesta:"sistema", pregunta:"Conjunto de relaciones", estado:0},
+  {letra:"T", respuesta:"tiempo", pregunta:"Valor si llega tarde", estado:0},
+  {letra:"U", respuesta:"unidad", pregunta:"Espacio promocional", estado:0},
+  {letra:"V", respuesta:"ventaja", pregunta:"Beneficio competitivo", estado:0},
+  {letra:"X", respuesta:"mix", pregunta:"Contiene la X: Parte de estrategia", estado:0},
+  {letra:"Y", respuesta:"mayor", pregunta:"Contiene la Y: Deben prestar ___ atención", estado:0},
+  {letra:"Z", respuesta:"organizacion", pregunta:"Contiene la Z: Conjunto de individuos", estado:0}
+];
+
+let actual = 0;
+let tiempo = 120; // segundos
+let intervalo;
+
+const rosco = document.getElementById("rosco");
+const radio = 180;
+
+preguntas.forEach((p, i) => {
+  const angle = (i / preguntas.length) * 2 * Math.PI;
+  const x = 225 + radio * Math.cos(angle) - 21;
+  const y = 225 + radio * Math.sin(angle) - 21;
+
+  const div = document.createElement("div");
+  div.className = "letra";
+  div.id = "letra-" + i;
+  div.style.left = x + "px";
+  div.style.top = y + "px";
+  div.innerText = p.letra;
+
+  rosco.appendChild(div);
+});
+
+function actualizarUI() {
+  mantenerFoco();
+  document.querySelectorAll('.letra').forEach(l => l.classList.remove('activa'));
+  document.getElementById("letra-" + actual).classList.add("activa");
+  document.getElementById("pregunta").innerText = preguntas[actual].pregunta;
+
+  let correctas = preguntas.filter(p => p.estado === 1).length;
+  document.getElementById("score").innerText = "✔ " + correctas + " / " + preguntas.length;
+}
+
+function siguiente() {
+  let vueltas = 0;
+  do {
+    actual = (actual + 1) % preguntas.length;
+    vueltas++;
+  } while (preguntas[actual].estado !== 0 && vueltas < preguntas.length);
+  actualizarUI();
+
+// ⏱️ Temporizador
+function iniciarTimer(){
+  intervalo = setInterval(()=>{
+    tiempo--;
+    document.getElementById("timer").innerText = "⏱️ " + tiempo + "s";
+
+    if(tiempo <= 0){
+      clearInterval(intervalo);
+      finalizarJuego();
+    }
+  },1000);
+}
+
+function finalizarJuego(){
+  let correctas = preguntas.filter(p => p.estado === 1).length;
+  alert("⏱️ Tiempo terminado!
+Puntaje: " + correctas + "/" + preguntas.length);
+}
+
+// 🎮 Controles teclado
+document.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    responder();
+  }
+  if(e.code === "Space"){
+    e.preventDefault();
+    pasar();
+  }
+});
+
+iniciarTimer();
+
+// foco automático al input
+const inputBox = document.getElementById("respuesta");
+inputBox.focus();
+
+// mantener foco después de cada acción
+function mantenerFoco(){ inputBox.focus(); }
+
+}
+
+function responder() {
+  mantenerFoco();
+  const input = document.getElementById("respuesta");
+  const resp = input.value.toLowerCase().trim();
+  if (!resp) return;
+
+  const p = preguntas[actual];
+  const letra = document.getElementById("letra-" + actual);
+
+  if (resp === p.respuesta) {
+    letra.classList.add("correcta");
+    p.estado = 1;
+  } else {
+    letra.classList.add("incorrecta");
+    p.estado = -1;
+  }
+
+  input.value = "";
+  siguiente();
+}
+
+function pasar() {
+  mantenerFoco();
+  mantenerFoco();
+  siguiente();
+}
+
+actualizarUI();
+</script>
+
+</body>
+</html>
