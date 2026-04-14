@@ -97,8 +97,8 @@ button {
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-// 📚 Preguntas
 const preguntas = [
 {letra:"A", respuesta:"acuerdos", pregunta:"Empieza con A: Operaciones comerciales", estado:0},
 {letra:"B", respuesta:"bienes", pregunta:"Empieza con B: Productos y servicios", estado:0},
@@ -106,7 +106,7 @@ const preguntas = [
 {letra:"D", respuesta:"demanda", pregunta:"Empieza con D: El canal la satisface", estado:0},
 {letra:"E", respuesta:"entorno", pregunta:"Empieza con E: Factores externos", estado:0},
 {letra:"F", respuesta:"forma", pregunta:"Empieza con F: Estado del producto", estado:0},
-{letra:"G", respuesta:"gestion", pregunta:"Empieza con G: Administración comercial", estado:0},
+{letra:"G", respuesta:"gestion", pregunta:"Empieza con G: Administración", estado:0},
 {letra:"H", respuesta:"hipermercados", pregunta:"Empieza con H: Grandes tiendas", estado:0},
 {letra:"I", respuesta:"interorganizacional", pregunta:"Empieza con I: Relación entre empresas", estado:0},
 {letra:"J", respuesta:"conjunto", pregunta:"Contiene la J: Grupo de elementos", estado:0},
@@ -115,28 +115,29 @@ const preguntas = [
 {letra:"N", respuesta:"nacionales", pregunta:"Empieza con N: Factores del país", estado:0},
 {letra:"Ñ", respuesta:"mañana", pregunta:"Contiene la Ñ: Momento del día", estado:0},
 {letra:"O", respuesta:"objetivos", pregunta:"Empieza con O: Metas", estado:0},
-{letra:"P", respuesta:"poder", pregunta:"Empieza con P: Capacidad de influir", estado:0},
+{letra:"P", respuesta:"poder", pregunta:"Empieza con P: Influencia", estado:0},
 {letra:"Q", respuesta:"quiere", pregunta:"Contiene la Q: Lo que busca lograr", estado:0},
 {letra:"R", respuesta:"rentabilidad", pregunta:"Empieza con R: Ganancia", estado:0},
 {letra:"S", respuesta:"sistema", pregunta:"Empieza con S: Conjunto organizado", estado:0},
 {letra:"T", respuesta:"tiempo", pregunta:"Empieza con T: Valor si llega tarde", estado:0},
 {letra:"U", respuesta:"unidad", pregunta:"Empieza con U: Espacio promocional", estado:0},
 {letra:"V", respuesta:"ventaja", pregunta:"Empieza con V: Beneficio", estado:0},
-{letra:"X", respuesta:"mix", pregunta:"Contiene la X: Estrategia comercial", estado:0},
+{letra:"X", respuesta:"mix", pregunta:"Contiene la X: Estrategia", estado:0},
 {letra:"Y", respuesta:"mayor", pregunta:"Contiene la Y: Más atención", estado:0},
 {letra:"Z", respuesta:"organizacion", pregunta:"Contiene la Z: Grupo de personas", estado:0}
 ];
 
 let actual = 0;
-let tiempo = 120;
 
-// 🎯 Crear rosco
+// 🎯 CREAR ROSCO
 const rosco = document.getElementById("rosco");
+
 const radio = 180;
 const centro = 225;
 
 preguntas.forEach((p, i) => {
   const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
+
   const x = centro + radio * Math.cos(angulo) - 21;
   const y = centro + radio * Math.sin(angulo) - 21;
 
@@ -150,69 +151,40 @@ preguntas.forEach((p, i) => {
   rosco.appendChild(div);
 });
 
-// UI
+// TEST (si ves esto en consola, funciona)
+console.log("ROSCO CREADO");
+
+// resto lógica mínima
 function actualizarUI() {
-  document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
-  document.getElementById("letra-" + actual).classList.add("activa");
   document.getElementById("pregunta").innerText = preguntas[actual].pregunta;
 }
 
-// lógica
-function siguiente() {
-  let vueltas = 0;
-  do {
-    actual = (actual + 1) % preguntas.length;
-    vueltas++;
-  } while (preguntas[actual].estado !== 0 && vueltas < preguntas.length);
-  actualizarUI();
-}
-
-function responder() {
+window.responder = function() {
   const input = document.getElementById("respuesta");
   const resp = input.value.toLowerCase().trim();
   if (!resp) return;
 
-  const p = preguntas[actual];
   const letra = document.getElementById("letra-" + actual);
 
-  if (resp === p.respuesta) {
+  if (resp === preguntas[actual].respuesta) {
     letra.classList.add("correcta");
-    p.estado = 1;
   } else {
     letra.classList.add("incorrecta");
-    p.estado = -1;
   }
 
+  actual = (actual + 1) % preguntas.length;
   input.value = "";
-  siguiente();
-}
+  actualizarUI();
+};
 
-function pasar() {
-  siguiente();
-}
+window.pasar = function() {
+  actual = (actual + 1) % preguntas.length;
+  actualizarUI();
+};
 
-// teclado
-document.addEventListener("keydown", function(e){
-  if(e.key === "Enter") responder();
-  if(e.code === "Space"){
-    e.preventDefault();
-    pasar();
-  }
-});
-
-// timer
-setInterval(()=>{
-  tiempo--;
-  document.getElementById("timer").innerText = "⏱️ " + tiempo + "s";
-
-  if(tiempo <= 0){
-    alert("⏱️ Tiempo terminado");
-    location.reload();
-  }
-},1000);
-
-// iniciar
 actualizarUI();
+
+});
 
 </script>
 
