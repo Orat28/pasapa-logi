@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pasapalabra Logistica</title>
+<title>Pasapalabra Logística</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
@@ -18,22 +18,28 @@ body {
 h1 {
   color: #00d4ff;
   text-shadow: 0 0 10px #00d4ff;
+  font-size: 5vw;
 }
 
+/* CONTENEDOR */
 #game {
   display: flex;
   justify-content: center;
-  gap: 40px;
-  margin-top: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  padding: 20px;
 }
 
+/* ROSCO */
 #rosco {
   position: relative;
-  width: 450px;
-  height: 450px;
+  width: min(90vw, 450px);
+  height: min(90vw, 450px);
   border-radius: 50%;
 }
 
+/* LETRAS */
 .letra {
   position: absolute;
   width: 42px;
@@ -48,39 +54,62 @@ h1 {
 }
 
 .activa {
-  transform: scale(1.2);
+  transform: scale(1.3);
   box-shadow: 0 0 15px yellow;
 }
 
 .correcta { background: green !important; }
 .incorrecta { background: red !important; }
 
+/* PANEL */
 #panel {
-  width: 300px;
+  width: min(90vw, 320px);
 }
 
+/* INPUT */
 input {
-  padding: 10px;
-  width: 90%;
+  padding: 12px;
+  width: 100%;
+  font-size: 16px;
+  margin-top: 10px;
 }
 
+/* BOTONES */
 button {
-  padding: 10px;
+  padding: 12px;
   margin: 5px;
+  width: 45%;
+  font-size: 14px;
   cursor: pointer;
 }
 
+/* TIMER */
 #timer {
   margin-top: 10px;
   font-size: 20px;
   color: #00d4ff;
+}
+
+/* 📱 CELULAR */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 7vw;
+  }
+
+  #game {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<h1> PASAPALABRA LOGISTICA</h1>
+<h1> PASAPALABRA LOGÍSTICA</h1>
 
 <div id="game">
   <div id="rosco"></div>
@@ -89,8 +118,8 @@ button {
     <div id="pregunta"></div>
     <input type="text" id="respuesta" placeholder="Tu respuesta..." autofocus>
     <br>
-    <button onclick="responder()">Responder</button>
-    <button onclick="pasar()">Pasar</button>
+    <button onclick="responder()">Responder (ENTER)</button>
+    <button onclick="pasar()">Pasar (ESPACIO)</button>
     <div id="timer"></div>
   </div>
 </div>
@@ -107,57 +136,60 @@ const preguntas = [
   {letra:"F", respuesta:"fabrica", pregunta:"Empieza con F: Lugar donde se hacen los productos", estado:0},
   {letra:"G", respuesta:"gratis", pregunta:"Empieza con G: Algo que no cuesta dinero", estado:0},
   {letra:"H", respuesta:"horario", pregunta:"Empieza con H: Tiempo en que una tienda está abierta", estado:0},
-  {letra:"I", respuesta:"internet", pregunta:"Empieza con I: Red para comprar de forma online", estado:0},
-  {letra:"J", respuesta:"tarjeta", pregunta:"Contiene la J: Objeto de plástico para pagar sin efectivo", estado:0},
-  {letra:"L", respuesta:"logotipo", pregunta:"Empieza con L: Dibujo que representa a una marca", estado:0},
-  {letra:"M", respuesta:"mercado", pregunta:"Empieza con M: Lugar físico o virtual de compra y venta", estado:0},
-  {letra:"N", respuesta:"negocio", pregunta:"Empieza con N: Local comercial o tienda", estado:0},
-  {letra:"Ñ", respuesta:"tamaño", pregunta:"Contiene la Ñ: Medida de un producto (pequeño, grande...)", estado:0},
-  {letra:"O", respuesta:"oferta", pregunta:"Empieza con O: Promoción especial para atraer compradores", estado:0},
-  {letra:"P", respuesta:"precio", pregunta:"Empieza con P: Valor en dinero de una cosa", estado:0},
-  {letra:"Q", respuesta:"etiqueta", pregunta:"Contiene la Q: Papel pegado al producto con información o precio", estado:0},
-  {letra:"R", respuesta:"regalo", pregunta:"Empieza con R: Obsequio que se da al cliente", estado:0},
-  {letra:"S", respuesta:"servicio", pregunta:"Empieza con S: Lo que se ofrece y no es un objeto físico", estado:0},
-  {letra:"T", respuesta:"tienda", pregunta:"Empieza con T: Establecimiento donde se venden cosas", estado:0},
-  {letra:"U", respuesta:"usar", pregunta:"Empieza con U: Utilizar un producto después de comprarlo", estado:0},
-  {letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Persona que entrega el producto por dinero", estado:0},
-  {letra:"X", respuesta:"exito", pregunta:"Contiene la X: Cuando a un producto le va muy bien", estado:0},
-  {letra:"Y", respuesta:"ayuda", pregunta:"Contiene la Y: Lo que pides al servicio de atención al cliente", estado:0},
-  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Tienda donde se compran calzados", estado:0}
+  {letra:"I", respuesta:"internet", pregunta:"Empieza con I: Red para comprar online", estado:0},
+  {letra:"J", respuesta:"tarjeta", pregunta:"Contiene la J: Objeto para pagar sin efectivo", estado:0},
+  {letra:"L", respuesta:"logotipo", pregunta:"Empieza con L: Representa una marca", estado:0},
+  {letra:"M", respuesta:"mercado", pregunta:"Empieza con M: Lugar de compra y venta", estado:0},
+  {letra:"N", respuesta:"negocio", pregunta:"Empieza con N: Local comercial", estado:0},
+  {letra:"Ñ", respuesta:"tamaño", pregunta:"Contiene la Ñ: Medida de un producto", estado:0},
+  {letra:"O", respuesta:"oferta", pregunta:"Empieza con O: Promoción especial", estado:0},
+  {letra:"P", respuesta:"precio", pregunta:"Empieza con P: Valor en dinero", estado:0},
+  {letra:"Q", respuesta:"etiqueta", pregunta:"Contiene la Q: Información del producto", estado:0},
+  {letra:"R", respuesta:"regalo", pregunta:"Empieza con R: Obsequio al cliente", estado:0},
+  {letra:"S", respuesta:"servicio", pregunta:"Empieza con S: No es objeto físico", estado:0},
+  {letra:"T", respuesta:"tienda", pregunta:"Empieza con T: Lugar donde se vende", estado:0},
+  {letra:"U", respuesta:"usar", pregunta:"Empieza con U: Utilizar producto", estado:0},
+  {letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Quien vende", estado:0},
+  {letra:"X", respuesta:"exito", pregunta:"Contiene la X: Cuando algo va bien", estado:0},
+  {letra:"Y", respuesta:"ayuda", pregunta:"Contiene la Y: Atención al cliente", estado:0},
+  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Venta de calzado", estado:0}
 ];
+
 let actual = 0;
 let tiempo = 120;
 let intervalo;
 
-// 🎯 Crear rosco
 const rosco = document.getElementById("rosco");
-const radio = 180;
-const centro = 225;
 
-preguntas.forEach((p, i) => {
-  const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
-  const x = centro + radio * Math.cos(angulo) - 21;
-  const y = centro + radio * Math.sin(angulo) - 21;
+// Crear rosco adaptable
+function crearRosco(){
+  rosco.innerHTML = "";
+  const radio = rosco.offsetWidth / 2 - 30;
+  const centro = rosco.offsetWidth / 2;
 
-  const div = document.createElement("div");
-  div.className = "letra";
-  div.id = "letra-" + i;
-  div.style.left = x + "px";
-  div.style.top = y + "px";
-  div.innerText = p.letra;
+  preguntas.forEach((p, i) => {
+    const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
+    const x = centro + radio * Math.cos(angulo) - 21;
+    const y = centro + radio * Math.sin(angulo) - 21;
 
-  rosco.appendChild(div);
-});
+    const div = document.createElement("div");
+    div.className = "letra";
+    div.id = "letra-" + i;
+    div.style.left = x + "px";
+    div.style.top = y + "px";
+    div.innerText = p.letra;
 
-// UI
-function actualizarUI() {
+    rosco.appendChild(div);
+  });
+}
+
+function actualizarUI(){
   document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
   document.getElementById("letra-" + actual).classList.add("activa");
   document.getElementById("pregunta").innerText = preguntas[actual].pregunta;
 }
 
-// lógica
-function siguiente() {
+function siguiente(){
   let vueltas = 0;
   do {
     actual = (actual + 1) % preguntas.length;
@@ -166,7 +198,7 @@ function siguiente() {
   actualizarUI();
 }
 
-window.responder = function() {
+window.responder = function(){
   const input = document.getElementById("respuesta");
   const resp = input.value.toLowerCase().trim();
   if (!resp) return;
@@ -174,7 +206,7 @@ window.responder = function() {
   const p = preguntas[actual];
   const letra = document.getElementById("letra-" + actual);
 
-  if (resp === p.respuesta) {
+  if (resp === p.respuesta){
     letra.classList.add("correcta");
     p.estado = 1;
   } else {
@@ -184,21 +216,19 @@ window.responder = function() {
 
   input.value = "";
 
-  // terminar si ya respondió todo
-  if (preguntas.every(p => p.estado !== 0)) {
+  if (preguntas.every(p => p.estado !== 0)){
     clearInterval(intervalo);
     finalizarJuego();
     return;
   }
 
   siguiente();
-};
+}
 
-window.pasar = function() {
+window.pasar = function(){
   siguiente();
-};
+}
 
-// teclado
 document.addEventListener("keydown", function(e){
   if(e.key === "Enter") responder();
   if(e.code === "Space"){
@@ -207,20 +237,18 @@ document.addEventListener("keydown", function(e){
   }
 });
 
-// ⏱️ timer REAL
 function iniciarTimer(){
   intervalo = setInterval(() => {
     tiempo--;
     document.getElementById("timer").innerText = "⏱️ " + tiempo + "s";
 
-    if (tiempo <= 0) {
+    if (tiempo <= 0){
       clearInterval(intervalo);
       finalizarJuego();
     }
   }, 1000);
 }
 
-// 🏁 final
 function finalizarJuego(){
   let correctas = preguntas.filter(p => p.estado === 1).length;
   let incorrectas = preguntas.filter(p => p.estado === -1).length;
@@ -235,7 +263,13 @@ function finalizarJuego(){
 }
 
 // iniciar
-actualizarUI();
+setTimeout(() => {
+  crearRosco();
+  actualizarUI();
+}, 100);
+
+window.addEventListener("resize", crearRosco);
+
 iniciarTimer();
 
 });
