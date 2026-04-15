@@ -4,137 +4,226 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Pasapalabra</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #001f3f;
-  color: white;
-  text-align: center;
+body{
+  margin:0;
+  font-family:Arial;
+  background:#001f3f;
+  color:white;
+  text-align:center;
 }
 
 /* INICIO */
-#inicio {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+#inicio{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
-#inicio h1 {
-  font-size: 40px;
-}
-
-#inicio button {
-  padding: 15px 30px;
-  font-size: 20px;
+#inicio button{
+  padding:15px 30px;
+  font-size:20px;
 }
 
 /* JUEGO */
-#game {
-  display: none;
+#game{
+  display:none;
+  padding:20px;
 }
 
-#rosco {
-  position: relative;
-  width: 90vw;
-  height: 90vw;
-  max-width: 350px;
-  margin: auto;
+#rosco{
+  position:relative;
+  width:90vw;
+  height:90vw;
+  max-width:350px;
+  margin:auto;
 }
 
-.letra {
-  position: absolute;
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background: blue;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.letra{
+  position:absolute;
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  background:#00aaff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.correcta { background: green; }
-.incorrecta { background: red; }
+.activa{
+  transform:scale(1.2);
+  background:yellow;
+}
 
-button {
-  margin-top: 10px;
+.correcta{background:green;}
+.incorrecta{background:red;}
+
+input{
+  width:80%;
+  padding:10px;
+  margin-top:10px;
+}
+
+button{
+  margin-top:10px;
+  padding:10px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- INICIO -->
 <div id="inicio">
   <h1>PASAPALABRA</h1>
   <button id="btnJugar">JUGAR</button>
 </div>
 
+<!-- JUEGO -->
 <div id="game">
   <div id="rosco"></div>
   <div id="pregunta"></div>
-  <input id="respuesta">
+
+  <input id="respuesta" placeholder="Responder...">
+
   <br>
   <button id="responderBtn">RESPONDER</button>
+  <button id="pasarBtn">PASAR</button>
+
+  <div id="timer"></div>
+  <div id="resultado"></div>
 </div>
 
 <script>
 const preguntasBase = [
-  {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A"},
-  {letra:"B", respuesta:"barato", pregunta:"Empieza con B"},
-  {letra:"C", respuesta:"cliente", pregunta:"Empieza con C"}
+  {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A", estado:0},
+  {letra:"B", respuesta:"barato", pregunta:"Empieza con B", estado:0},
+  {letra:"C", respuesta:"cliente", pregunta:"Empieza con C", estado:0},
+  {letra:"D", respuesta:"descuento", pregunta:"Empieza con D", estado:0}
 ];
 
-let preguntas, actual = 0;
+let preguntas, actual, tiempo, intervalo;
 
-/* BOTÓN JUGAR */
+/* INICIO */
 document.getElementById("btnJugar").addEventListener("click", () => {
-  document.getElementById("inicio").style.display = "none";
-  document.getElementById("game").style.display = "block";
+  document.getElementById("inicio").style.display="none";
+  document.getElementById("game").style.display="block";
 
-  preguntas = preguntasBase.map(p => ({...p, estado:0}));
+  preguntas = preguntasBase.map(p => ({...p}));
+  actual = 0;
+  tiempo = 60;
 
   crearRosco();
-  mostrarPregunta();
+  actualizarUI();
+  iniciarTimer();
 });
 
 /* ROSCO */
 function crearRosco(){
   const rosco = document.getElementById("rosco");
-  rosco.innerHTML = "";
+  const size = rosco.offsetWidth;
+  rosco.innerHTML="";
+
+  const radio = size/2 - 30;
+  const centro = size/2;
 
   preguntas.forEach((p,i)=>{
-    const div = document.createElement("div");
+    const ang = (i/preguntas.length)*2*Math.PI - Math.PI/2;
+    const x = centro + radio*Math.cos(ang)-17;
+    const y = centro + radio*Math.sin(ang)-17;
+
+    const div=document.createElement("div");
     div.className="letra";
+    div.id="letra-"+i;
+    div.style.left=x+"px";
+    div.style.top=y+"px";
     div.innerText=p.letra;
-    div.style.left = (i*40)+"px";
+
     rosco.appendChild(div);
   });
 }
 
-/* PREGUNTA */
-function mostrarPregunta(){
+/* UI */
+function actualizarUI(){
+  document.querySelectorAll(".letra").forEach(l=>l.classList.remove("activa"));
+  document.getElementById("letra-"+actual).classList.add("activa");
+
   document.getElementById("pregunta").innerText =
     preguntas[actual].pregunta;
 }
 
-/* RESPONDER */
-document.getElementById("responderBtn").addEventListener("click", () => {
-  const input = document.getElementById("respuesta");
-  const resp = input.value.toLowerCase();
+/* SIGUIENTE */
+function siguiente(){
+  do{
+    actual=(actual+1)%preguntas.length;
+  }while(preguntas[actual].estado!==0);
 
-  if(resp === preguntas[actual].respuesta){
-    alert("Correcto");
-  } else {
-    alert("Incorrecto");
+  actualizarUI();
+}
+
+/* RESPONDER */
+document.getElementById("responderBtn").addEventListener("click", ()=>{
+  const input=document.getElementById("respuesta");
+  const resp=input.value.toLowerCase().trim();
+
+  if(!resp) return;
+
+  const p=preguntas[actual];
+  const letra=document.getElementById("letra-"+actual);
+
+  if(resp===p.respuesta){
+    letra.classList.add("correcta");
+    p.estado=1;
+  }else{
+    letra.classList.add("incorrecta");
+    p.estado=-1;
   }
 
   input.value="";
+
+  if(preguntas.every(p=>p.estado!==0)){
+    finalizar();
+    return;
+  }
+
+  siguiente();
 });
+
+/* PASAR */
+document.getElementById("pasarBtn").addEventListener("click", siguiente);
+
+/* ENTER */
+document.getElementById("respuesta").addEventListener("keydown", (e)=>{
+  if(e.key==="Enter"){
+    e.preventDefault();
+    document.getElementById("responderBtn").click();
+  }
+});
+
+/* TIMER */
+function iniciarTimer(){
+  intervalo=setInterval(()=>{
+    tiempo--;
+    document.getElementById("timer").innerText="⏱ "+tiempo;
+
+    if(tiempo<=0) finalizar();
+  },1000);
+}
+
+/* FINAL */
+function finalizar(){
+  clearInterval(intervalo);
+
+  let c=preguntas.filter(p=>p.estado===1).length;
+  let i=preguntas.filter(p=>p.estado===-1).length;
+
+  document.getElementById("resultado").innerHTML =
+    `FIN<br>✅ ${c} | ❌ ${i}`;
+}
 </script>
 
 </body>
