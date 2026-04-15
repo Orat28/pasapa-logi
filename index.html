@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pasapalabra Logística</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
@@ -15,73 +16,91 @@ body {
   text-align: center;
 }
 
+/* TITULO */
 h1 {
   color: #00d4ff;
-  text-shadow: 0 0 10px #00d4ff;
-  font-size: 5vw;
+  font-size: 6vw;
 }
 
 /* CONTENEDOR */
 #game {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 30px;
-  padding: 20px;
+  gap: 20px;
+  padding: 15px;
 }
 
 /* ROSCO */
 #rosco {
   position: relative;
-  width: min(90vw, 450px);
-  height: min(90vw, 450px);
+  width: 90vw;
+  height: 90vw;
+  max-width: 380px;
+  max-height: 380px;
   border-radius: 50%;
 }
 
 /* LETRAS */
 .letra {
   position: absolute;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: #00aaff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  transition: 0.3s;
 }
 
 .activa {
   transform: scale(1.3);
-  box-shadow: 0 0 15px yellow;
+  box-shadow: 0 0 10px yellow;
 }
 
-.correcta { background: green !important; }
-.incorrecta { background: red !important; }
+.correcta { background: #00c853 !important; }
+.incorrecta { background: #ff1744 !important; }
 
 /* PANEL */
 #panel {
-  width: min(90vw, 320px);
+  width: 90%;
+  max-width: 350px;
+}
+
+/* PREGUNTA */
+#pregunta {
+  min-height: 60px;
 }
 
 /* INPUT */
 input {
-  padding: 12px;
   width: 100%;
-  font-size: 16px;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
   margin-top: 10px;
 }
 
 /* BOTONES */
-button {
-  padding: 12px;
-  margin: 5px;
-  width: 45%;
-  font-size: 14px;
-  cursor: pointer;
+.botones {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
+
+button {
+  flex: 1;
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  font-weight: bold;
+}
+
+#responderBtn { background: #00c853; }
+#pasarBtn { background: #ff9100; }
 
 /* TIMER */
 #timer {
@@ -90,44 +109,48 @@ button {
   color: #00d4ff;
 }
 
-/* 📱 CELULAR */
-@media (max-width: 600px) {
-  h1 {
-    font-size: 7vw;
-  }
-
-  #game {
-    flex-direction: column;
-  }
-
-  button {
-    width: 100%;
-  }
+/* RESULTADO */
+#resultado {
+  margin-top: 15px;
+  font-size: 18px;
 }
 </style>
 </head>
 
 <body>
 
-<h1> PASAPALABRA LOGÍSTICA</h1>
+<h1>PASAPALABRA</h1>
 
 <div id="game">
   <div id="rosco"></div>
 
   <div id="panel">
     <div id="pregunta"></div>
-    <input type="text" id="respuesta" placeholder="Tu respuesta..." autofocus>
-    <br>
-    <button onclick="responder()">Responder (ENTER)</button>
-    <button onclick="pasar()">Pasar (ESPACIO)</button>
+
+    <input 
+      type="text" 
+      id="respuesta" 
+      placeholder="Escribí tu respuesta..."
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      enterkeyhint="done"
+    >
+
+    <div class="botones">
+      <button id="responderBtn">RESPONDER</button>
+      <button id="pasarBtn">PASAR</button>
+    </div>
+
     <div id="timer"></div>
+    <div id="resultado"></div>
   </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-const preguntas = [
+const preguntas = [ 
   {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A: Mensaje publicitario para vender algo", estado:0},
   {letra:"B", respuesta:"barato", pregunta:"Empieza con B: Producto que tiene un precio bajo", estado:0},
   {letra:"C", respuesta:"cliente", pregunta:"Empieza con C: Persona que compra un producto", estado:0},
@@ -152,25 +175,30 @@ const preguntas = [
   {letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Quien vende", estado:0},
   {letra:"X", respuesta:"exito", pregunta:"Contiene la X: Cuando algo va bien", estado:0},
   {letra:"Y", respuesta:"ayuda", pregunta:"Contiene la Y: Atención al cliente", estado:0},
-  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Venta de calzado", estado:0}
+  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Venta de calzado", estado:0} 
 ];
-
 let actual = 0;
 let tiempo = 120;
 let intervalo;
 
 const rosco = document.getElementById("rosco");
+const input = document.getElementById("respuesta");
 
-// Crear rosco adaptable
+/* 🔊 Vibración */
+function vibrar(ms){
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+/* ROSCO */
 function crearRosco(){
   rosco.innerHTML = "";
-  const radio = rosco.offsetWidth / 2 - 30;
+  const radio = rosco.offsetWidth / 2 - 25;
   const centro = rosco.offsetWidth / 2;
 
   preguntas.forEach((p, i) => {
     const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
-    const x = centro + radio * Math.cos(angulo) - 21;
-    const y = centro + radio * Math.sin(angulo) - 21;
+    const x = centro + radio * Math.cos(angulo) - 19;
+    const y = centro + radio * Math.sin(angulo) - 19;
 
     const div = document.createElement("div");
     div.className = "letra";
@@ -183,12 +211,16 @@ function crearRosco(){
   });
 }
 
+/* UI */
 function actualizarUI(){
   document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
   document.getElementById("letra-" + actual).classList.add("activa");
   document.getElementById("pregunta").innerText = preguntas[actual].pregunta;
+
+  setTimeout(() => input.focus(), 100);
 }
 
+/* SIGUIENTE */
 function siguiente(){
   let vueltas = 0;
   do {
@@ -198,8 +230,8 @@ function siguiente(){
   actualizarUI();
 }
 
-window.responder = function(){
-  const input = document.getElementById("respuesta");
+/* RESPONDER */
+function responder(){
   const resp = input.value.toLowerCase().trim();
   if (!resp) return;
 
@@ -209,15 +241,16 @@ window.responder = function(){
   if (resp === p.respuesta){
     letra.classList.add("correcta");
     p.estado = 1;
+    vibrar(50);
   } else {
     letra.classList.add("incorrecta");
     p.estado = -1;
+    vibrar([100, 50, 100]);
   }
 
   input.value = "";
 
   if (preguntas.every(p => p.estado !== 0)){
-    clearInterval(intervalo);
     finalizarJuego();
     return;
   }
@@ -225,44 +258,49 @@ window.responder = function(){
   siguiente();
 }
 
-window.pasar = function(){
+/* PASAR */
+function pasar(){
+  vibrar(30);
   siguiente();
 }
 
-document.addEventListener("keydown", function(e){
-  if(e.key === "Enter") responder();
-  if(e.code === "Space"){
+/* EVENTOS */
+document.getElementById("responderBtn").onclick = responder;
+document.getElementById("pasarBtn").onclick = pasar;
+
+input.addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
     e.preventDefault();
-    pasar();
+    responder();
   }
 });
 
+/* TIMER */
 function iniciarTimer(){
   intervalo = setInterval(() => {
     tiempo--;
     document.getElementById("timer").innerText = "⏱️ " + tiempo + "s";
 
     if (tiempo <= 0){
-      clearInterval(intervalo);
       finalizarJuego();
     }
   }, 1000);
 }
 
+/* FINAL */
 function finalizarJuego(){
+  clearInterval(intervalo);
+
   let correctas = preguntas.filter(p => p.estado === 1).length;
   let incorrectas = preguntas.filter(p => p.estado === -1).length;
 
-  alert(
-    "🏁 FIN DEL JUEGO\n\n" +
-    "✅ Correctas: " + correctas + "\n" +
-    "❌ Incorrectas: " + incorrectas
-  );
+  document.getElementById("resultado").innerHTML =
+    `🏁 FIN<br>✅ ${correctas} | ❌ ${incorrectas}`;
 
-  location.reload();
+  vibrar([200,100,200]);
 }
 
-// iniciar
+/* INIT */
 setTimeout(() => {
   crearRosco();
   actualizarUI();
