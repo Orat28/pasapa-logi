@@ -191,9 +191,15 @@ function vibrar(ms){
 
 /* ROSCO */
 function crearRosco(){
+  const size = rosco.offsetWidth;
+
+  // 🚫 evitar dibujar si aún no tiene tamaño
+  if (!size || size < 100) return;
+
   rosco.innerHTML = "";
-  const radio = rosco.offsetWidth / 2 - 25;
-  const centro = rosco.offsetWidth / 2;
+
+  const radio = size / 2 - 25;
+  const centro = size / 2;
 
   preguntas.forEach((p, i) => {
     const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
@@ -207,14 +213,13 @@ function crearRosco(){
     div.style.top = y + "px";
     div.innerText = p.letra;
 
-    // 🔥 RESTAURAR ESTADO
+    // mantener colores
     if (p.estado === 1) div.classList.add("correcta");
     if (p.estado === -1) div.classList.add("incorrecta");
 
     rosco.appendChild(div);
   });
-}}
-
+}
 /* UI */
 function actualizarUI(){
   document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
@@ -309,15 +314,11 @@ function iniciarJuego(){
   crearRosco();
   actualizarUI();
 }
-
-window.addEventListener("load", iniciarJuego);
-
 window.addEventListener("resize", () => {
   clearTimeout(window._resizeTimer);
-  window._resizeTimer = setTimeout(crearRosco, 200);
-});
-iniciarTimer();
-
+  window._resizeTimer = setTimeout(() => {
+    crearRosco();
+  }, 200);
 });
 </script>
 
