@@ -305,10 +305,12 @@ function finalizarJuego(){
 }
 
 /* INIT */
-setTimeout(() => {
+function iniciarJuego(){
   crearRosco();
   actualizarUI();
-}, 100);
+}
+
+window.addEventListener("load", iniciarJuego);
 
 window.addEventListener("resize", () => {
   clearTimeout(window._resizeTimer);
