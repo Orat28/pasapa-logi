@@ -207,9 +207,13 @@ function crearRosco(){
     div.style.top = y + "px";
     div.innerText = p.letra;
 
+    // 🔥 RESTAURAR ESTADO
+    if (p.estado === 1) div.classList.add("correcta");
+    if (p.estado === -1) div.classList.add("incorrecta");
+
     rosco.appendChild(div);
   });
-}
+}}
 
 /* UI */
 function actualizarUI(){
@@ -306,8 +310,10 @@ setTimeout(() => {
   actualizarUI();
 }, 100);
 
-window.addEventListener("resize", crearRosco);
-
+window.addEventListener("resize", () => {
+  clearTimeout(window._resizeTimer);
+  window._resizeTimer = setTimeout(crearRosco, 200);
+});
 iniciarTimer();
 
 });
