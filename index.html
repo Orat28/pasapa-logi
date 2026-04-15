@@ -17,13 +17,32 @@ body {
   text-align: center;
 }
 
-h1 {
-  color: #00d4ff;
-  font-size: 6vw;
+/* 🔥 PANTALLA INICIO */
+#inicio {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
+#inicio h1 {
+  font-size: 8vw;
+  color: #00d4ff;
+}
+
+#inicio button {
+  padding: 20px 40px;
+  font-size: 20px;
+  border: none;
+  border-radius: 15px;
+  background: #00c853;
+  color: white;
+}
+
+/* JUEGO */
 #game {
-  display: flex;
+  display: none;
   flex-direction: column;
   align-items: center;
   gap: 20px;
@@ -64,10 +83,6 @@ h1 {
   max-width: 350px;
 }
 
-#pregunta {
-  min-height: 60px;
-}
-
 input {
   width: 100%;
   padding: 14px;
@@ -95,42 +110,30 @@ button {
 #responderBtn { background: #00c853; }
 #pasarBtn { background: #ff9100; }
 
-#timer {
-  margin-top: 10px;
-  font-size: 20px;
-  color: #00d4ff;
-}
-
-#resultado {
-  margin-top: 15px;
-  font-size: 18px;
-}
+#timer { margin-top: 10px; }
+#resultado { margin-top: 15px; }
 </style>
 </head>
 
 <body>
 
-<h1>PASAPALABRA</h1>
+<!-- 🔥 INICIO -->
+<div id="inicio">
+  <h1>PASAPALABRA</h1>
+  <button onclick="empezar()">JUGAR</button>
+</div>
 
+<!-- 🎮 JUEGO -->
 <div id="game">
   <div id="rosco"></div>
 
   <div id="panel">
     <div id="pregunta"></div>
-
-    <input 
-      type="text" 
-      id="respuesta" 
-      placeholder="Escribí tu respuesta..."
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="off"
-      enterkeyhint="done"
-    >
+    <input id="respuesta" placeholder="Escribí..." />
 
     <div class="botones">
-      <button id="responderBtn">RESPONDER</button>
-      <button id="pasarBtn">PASAR</button>
+      <button onclick="responder()">RESPONDER</button>
+      <button onclick="pasar()">PASAR</button>
     </div>
 
     <div id="timer"></div>
@@ -139,170 +142,137 @@ button {
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-const preguntas = [ 
-  {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A: Mensaje publicitario", estado:0},
-  {letra:"B", respuesta:"barato", pregunta:"Empieza con B: Precio bajo", estado:0},
-  {letra:"C", respuesta:"cliente", pregunta:"Empieza con C: Persona que compra", estado:0},
-  {letra:"D", respuesta:"descuento", pregunta:"Empieza con D: Rebaja", estado:0},
-  {letra:"E", respuesta:"envase", pregunta:"Empieza con E: Contenedor", estado:0},
-  {letra:"F", respuesta:"fabrica", pregunta:"Empieza con F: Producción", estado:0},
-  {letra:"G", respuesta:"gratis", pregunta:"Empieza con G: Sin costo", estado:0},
-  {letra:"H", respuesta:"horario", pregunta:"Empieza con H: Apertura", estado:0},
-  {letra:"I", respuesta:"internet", pregunta:"Empieza con I: Compras online", estado:0},
-  {letra:"J", respuesta:"tarjeta", pregunta:"Contiene J: Medio de pago", estado:0},
-  {letra:"L", respuesta:"logotipo", pregunta:"Empieza con L: Marca", estado:0},
-  {letra:"M", respuesta:"mercado", pregunta:"Empieza con M: Compra y venta", estado:0},
-  {letra:"N", respuesta:"negocio", pregunta:"Empieza con N: Local", estado:0},
-  {letra:"Ñ", respuesta:"tamaño", pregunta:"Contiene Ñ: Medida", estado:0},
-  {letra:"O", respuesta:"oferta", pregunta:"Empieza con O: Promoción", estado:0},
-  {letra:"P", respuesta:"precio", pregunta:"Empieza con P: Valor", estado:0},
-  {letra:"Q", respuesta:"etiqueta", pregunta:"Contiene Q: Info", estado:0},
-  {letra:"R", respuesta:"regalo", pregunta:"Empieza con R: Obsequio", estado:0},
-  {letra:"S", respuesta:"servicio", pregunta:"Empieza con S: Intangible", estado:0},
-  {letra:"T", respuesta:"tienda", pregunta:"Empieza con T: Venta", estado:0},
-  {letra:"U", respuesta:"usar", pregunta:"Empieza con U: Utilizar", estado:0},
-  {letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Quien vende", estado:0},
-  {letra:"X", respuesta:"exito", pregunta:"Contiene X: Sale bien", estado:0},
-  {letra:"Y", respuesta:"ayuda", pregunta:"Contiene Y: Atención", estado:0},
-  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Calzado", estado:0}
+const preguntasBase = [
+  {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A: Mensaje publicitario"},
+  {letra:"B", respuesta:"barato", pregunta:"Empieza con B: Precio bajo"},
+  {letra:"C", respuesta:"cliente", pregunta:"Empieza con C: Persona que compra"},
+  {letra:"D", respuesta:"descuento", pregunta:"Empieza con D: Rebaja"},
+  {letra:"E", respuesta:"envase", pregunta:"Empieza con E: Contenedor"},
+  {letra:"F", respuesta:"fabrica", pregunta:"Empieza con F: Producción"},
+  {letra:"G", respuesta:"gratis", pregunta:"Empieza con G: Sin costo"},
+  {letra:"H", respuesta:"horario", pregunta:"Empieza con H: Apertura"},
+  {letra:"I", respuesta:"internet", pregunta:"Empieza con I: Online"},
+  {letra:"J", respuesta:"tarjeta", pregunta:"Contiene J: Pago"},
+  {letra:"L", respuesta:"logotipo", pregunta:"Empieza con L: Marca"},
+  {letra:"M", respuesta:"mercado", pregunta:"Empieza con M: Compra y venta"},
+  {letra:"N", respuesta:"negocio", pregunta:"Empieza con N: Local"},
+  {letra:"Ñ", respuesta:"tamaño", pregunta:"Contiene Ñ: Medida"},
+  {letra:"O", respuesta:"oferta", pregunta:"Empieza con O: Promoción"},
+  {letra:"P", respuesta:"precio", pregunta:"Empieza con P: Valor"},
+  {letra:"Q", respuesta:"etiqueta", pregunta:"Contiene Q: Info"},
+  {letra:"R", respuesta:"regalo", pregunta:"Empieza con R: Obsequio"},
+  {letra:"S", respuesta:"servicio", pregunta:"Empieza con S: Intangible"},
+  {letra:"T", respuesta:"tienda", pregunta:"Empieza con T: Venta"},
+  {letra:"U", respuesta:"usar", pregunta:"Empieza con U: Utilizar"},
+  {letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Quien vende"},
+  {letra:"X", respuesta:"exito", pregunta:"Contiene X: Sale bien"},
+  {letra:"Y", respuesta:"ayuda", pregunta:"Contiene Y: Atención"},
+  {letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Calzado"}
 ];
 
-let actual = 0;
-let tiempo = 120;
-let intervalo;
+let preguntas, actual, tiempo, intervalo;
 
-const rosco = document.getElementById("rosco");
-const input = document.getElementById("respuesta");
+/* INICIAR JUEGO */
+function empezar(){
+  document.getElementById("inicio").style.display = "none";
+  document.getElementById("game").style.display = "flex";
 
-function vibrar(ms){
-  if (navigator.vibrate) navigator.vibrate(ms);
+  preguntas = preguntasBase.map(p => ({...p, estado:0}));
+  actual = 0;
+  tiempo = 120;
+
+  crearRosco();
+  actualizarUI();
+  iniciarTimer();
 }
 
+/* ROSCO */
 function crearRosco(){
+  const rosco = document.getElementById("rosco");
   const size = rosco.offsetWidth;
-  if (!size || size < 100) return;
-
   rosco.innerHTML = "";
 
-  const radio = size / 2 - 25;
-  const centro = size / 2;
+  const radio = size/2 - 25;
+  const centro = size/2;
 
-  preguntas.forEach((p, i) => {
-    const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
-    const x = centro + radio * Math.cos(angulo) - 19;
-    const y = centro + radio * Math.sin(angulo) - 19;
+  preguntas.forEach((p,i)=>{
+    const ang = (i/preguntas.length)*2*Math.PI - Math.PI/2;
+    const x = centro + radio*Math.cos(ang)-19;
+    const y = centro + radio*Math.sin(ang)-19;
 
     const div = document.createElement("div");
-    div.className = "letra";
-    div.id = "letra-" + i;
-    div.style.left = x + "px";
-    div.style.top = y + "px";
-    div.innerText = p.letra;
-
-    if (p.estado === 1) div.classList.add("correcta");
-    if (p.estado === -1) div.classList.add("incorrecta");
+    div.className="letra";
+    div.id="letra-"+i;
+    div.style.left=x+"px";
+    div.style.top=y+"px";
+    div.innerText=p.letra;
 
     rosco.appendChild(div);
   });
 }
 
+/* UI */
 function actualizarUI(){
-  document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
-  document.getElementById("letra-" + actual).classList.add("activa");
-  document.getElementById("pregunta").innerText = preguntas[actual].pregunta;
-  setTimeout(() => input.focus(), 100);
+  document.querySelectorAll(".letra").forEach(l=>l.classList.remove("activa"));
+  document.getElementById("letra-"+actual).classList.add("activa");
+  document.getElementById("pregunta").innerText=preguntas[actual].pregunta;
 }
 
-function siguiente(){
-  let vueltas = 0;
-  do {
-    actual = (actual + 1) % preguntas.length;
-    vueltas++;
-  } while (preguntas[actual].estado !== 0 && vueltas < preguntas.length);
-  actualizarUI();
-}
-
+/* RESPONDER */
 function responder(){
+  const input = document.getElementById("respuesta");
   const resp = input.value.toLowerCase().trim();
-  if (!resp) return;
+  if(!resp) return;
 
   const p = preguntas[actual];
-  const letra = document.getElementById("letra-" + actual);
+  const letra = document.getElementById("letra-"+actual);
 
-  if (resp === p.respuesta){
+  if(resp === p.respuesta){
     letra.classList.add("correcta");
-    p.estado = 1;
-    vibrar(50);
-  } else {
+    p.estado=1;
+  }else{
     letra.classList.add("incorrecta");
-    p.estado = -1;
-    vibrar([100,50,100]);
+    p.estado=-1;
   }
 
-  input.value = "";
-
-  if (preguntas.every(p => p.estado !== 0)){
-    finalizarJuego();
-    return;
-  }
-
+  input.value="";
   siguiente();
 }
 
+/* PASAR */
 function pasar(){
-  vibrar(30);
   siguiente();
 }
 
-document.getElementById("responderBtn").onclick = responder;
-document.getElementById("pasarBtn").onclick = pasar;
+/* SIGUIENTE */
+function siguiente(){
+  do{
+    actual = (actual+1)%preguntas.length;
+  }while(preguntas[actual].estado!==0);
 
-input.addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    e.preventDefault();
-    responder();
-  }
-});
-
-function iniciarTimer(){
-  intervalo = setInterval(() => {
-    tiempo--;
-    document.getElementById("timer").innerText = "⏱️ " + tiempo + "s";
-
-    if (tiempo <= 0){
-      finalizarJuego();
-    }
-  }, 1000);
-}
-
-function finalizarJuego(){
-  clearInterval(intervalo);
-
-  let correctas = preguntas.filter(p => p.estado === 1).length;
-  let incorrectas = preguntas.filter(p => p.estado === -1).length;
-
-  document.getElementById("resultado").innerHTML =
-    `🏁 FIN<br>✅ ${correctas} | ❌ ${incorrectas}`;
-
-  vibrar([200,100,200]);
-}
-
-function iniciarJuego(){
-  crearRosco();
   actualizarUI();
 }
 
-window.addEventListener("resize", () => {
-  clearTimeout(window._resizeTimer);
-  window._resizeTimer = setTimeout(crearRosco, 200);
-});
+/* TIMER */
+function iniciarTimer(){
+  intervalo=setInterval(()=>{
+    tiempo--;
+    document.getElementById("timer").innerText="⏱️ "+tiempo;
 
-iniciarJuego();
-iniciarTimer();
+    if(tiempo<=0) finalizar();
+  },1000);
+}
 
-});
+/* FINAL */
+function finalizar(){
+  clearInterval(intervalo);
+
+  let c = preguntas.filter(p=>p.estado===1).length;
+  let i = preguntas.filter(p=>p.estado===-1).length;
+
+  document.getElementById("resultado").innerHTML =
+    `FIN<br>✅ ${c} | ❌ ${i}`;
+}
 </script>
 
 </body>
