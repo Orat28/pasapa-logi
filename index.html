@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pasapalabra</title>
+<title>Pasapalabra Logística</title>
 
 <style>
 body{
@@ -32,21 +32,21 @@ body{
 /* JUEGO */
 #game{
   display:none;
-  padding:20px;
+  padding:10px;
 }
 
 #rosco{
   position:relative;
   width:90vw;
   height:90vw;
-  max-width:350px;
+  max-width:380px;
   margin:auto;
 }
 
 .letra{
   position:absolute;
-  width:35px;
-  height:35px;
+  width:38px;
+  height:38px;
   border-radius:50%;
   background:#00aaff;
   display:flex;
@@ -55,23 +55,38 @@ body{
 }
 
 .activa{
-  transform:scale(1.2);
-  background:yellow;
+  transform:scale(1.3);
+  box-shadow:0 0 10px yellow;
 }
 
-.correcta{background:green;}
-.incorrecta{background:red;}
+.correcta{background:#00c853;}
+.incorrecta{background:#ff1744;}
 
 input{
-  width:80%;
-  padding:10px;
+  width:90%;
+  padding:15px;
+  font-size:18px;
+  border-radius:10px;
+  border:none;
+  margin-top:10px;
+}
+
+.botones{
+  display:flex;
+  gap:10px;
   margin-top:10px;
 }
 
 button{
-  margin-top:10px;
-  padding:10px;
+  flex:1;
+  padding:15px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
 }
+
+#responderBtn{background:#00c853;}
+#pasarBtn{background:#ff9100;}
 </style>
 </head>
 
@@ -90,9 +105,10 @@ button{
 
   <input id="respuesta" placeholder="Responder...">
 
-  <br>
-  <button id="responderBtn">RESPONDER</button>
-  <button id="pasarBtn">PASAR</button>
+  <div class="botones">
+    <button id="responderBtn">RESPONDER</button>
+    <button id="pasarBtn">PASAR</button>
+  </div>
 
   <div id="timer"></div>
   <div id="resultado"></div>
@@ -100,22 +116,51 @@ button{
 
 <script>
 const preguntasBase = [
-  {letra:"A", respuesta:"anuncio", pregunta:"Empieza con A", estado:0},
-  {letra:"B", respuesta:"barato", pregunta:"Empieza con B", estado:0},
-  {letra:"C", respuesta:"cliente", pregunta:"Empieza con C", estado:0},
-  {letra:"D", respuesta:"descuento", pregunta:"Empieza con D", estado:0}
+{letra:"A", respuesta:"anuncio", pregunta:"Empieza con A: Mensaje publicitario", estado:0},
+{letra:"B", respuesta:"barato", pregunta:"Empieza con B: Precio bajo", estado:0},
+{letra:"C", respuesta:"cliente", pregunta:"Empieza con C: Persona que compra", estado:0},
+{letra:"D", respuesta:"descuento", pregunta:"Empieza con D: Rebaja", estado:0},
+{letra:"E", respuesta:"envase", pregunta:"Empieza con E: Protege producto", estado:0},
+{letra:"F", respuesta:"fabrica", pregunta:"Empieza con F: Lugar de producción", estado:0},
+{letra:"G", respuesta:"gratis", pregunta:"Empieza con G: Sin costo", estado:0},
+{letra:"H", respuesta:"horario", pregunta:"Empieza con H: Tiempo abierto", estado:0},
+{letra:"I", respuesta:"internet", pregunta:"Empieza con I: Compras online", estado:0},
+{letra:"J", respuesta:"tarjeta", pregunta:"Contiene J: Pago electrónico", estado:0},
+{letra:"L", respuesta:"logotipo", pregunta:"Empieza con L: Marca visual", estado:0},
+{letra:"M", respuesta:"mercado", pregunta:"Empieza con M: Compra y venta", estado:0},
+{letra:"N", respuesta:"negocio", pregunta:"Empieza con N: Comercio", estado:0},
+{letra:"Ñ", respuesta:"tamaño", pregunta:"Contiene Ñ: Medida", estado:0},
+{letra:"O", respuesta:"oferta", pregunta:"Empieza con O: Promoción", estado:0},
+{letra:"P", respuesta:"precio", pregunta:"Empieza con P: Valor", estado:0},
+{letra:"Q", respuesta:"etiqueta", pregunta:"Contiene Q: Info producto", estado:0},
+{letra:"R", respuesta:"regalo", pregunta:"Empieza con R: Obsequio", estado:0},
+{letra:"S", respuesta:"servicio", pregunta:"Empieza con S: No tangible", estado:0},
+{letra:"T", respuesta:"tienda", pregunta:"Empieza con T: Lugar venta", estado:0},
+{letra:"U", respuesta:"usar", pregunta:"Empieza con U: Utilizar", estado:0},
+{letra:"V", respuesta:"vendedor", pregunta:"Empieza con V: Quien vende", estado:0},
+{letra:"X", respuesta:"exito", pregunta:"Contiene X: Buen resultado", estado:0},
+{letra:"Y", respuesta:"ayuda", pregunta:"Contiene Y: Atención cliente", estado:0},
+{letra:"Z", respuesta:"zapateria", pregunta:"Empieza con Z: Venta calzado", estado:0}
 ];
 
 let preguntas, actual, tiempo, intervalo;
 
+const rosco = document.getElementById("rosco");
+const input = document.getElementById("respuesta");
+
+/* VIBRAR */
+function vibrar(ms){
+  if(navigator.vibrate) navigator.vibrate(ms);
+}
+
 /* INICIO */
-document.getElementById("btnJugar").addEventListener("click", () => {
+document.getElementById("btnJugar").addEventListener("click", ()=>{
   document.getElementById("inicio").style.display="none";
   document.getElementById("game").style.display="block";
 
   preguntas = preguntasBase.map(p => ({...p}));
   actual = 0;
-  tiempo = 60;
+  tiempo = 120;
 
   crearRosco();
   actualizarUI();
@@ -124,17 +169,15 @@ document.getElementById("btnJugar").addEventListener("click", () => {
 
 /* ROSCO */
 function crearRosco(){
-  const rosco = document.getElementById("rosco");
-  const size = rosco.offsetWidth;
   rosco.innerHTML="";
-
-  const radio = size/2 - 30;
+  const size = rosco.offsetWidth;
+  const radio = size/2 - 25;
   const centro = size/2;
 
   preguntas.forEach((p,i)=>{
     const ang = (i/preguntas.length)*2*Math.PI - Math.PI/2;
-    const x = centro + radio*Math.cos(ang)-17;
-    const y = centro + radio*Math.sin(ang)-17;
+    const x = centro + radio*Math.cos(ang) - 19;
+    const y = centro + radio*Math.sin(ang) - 19;
 
     const div=document.createElement("div");
     div.className="letra";
@@ -142,6 +185,9 @@ function crearRosco(){
     div.style.left=x+"px";
     div.style.top=y+"px";
     div.innerText=p.letra;
+
+    if(p.estado===1) div.classList.add("correcta");
+    if(p.estado===-1) div.classList.add("incorrecta");
 
     rosco.appendChild(div);
   });
@@ -151,25 +197,23 @@ function crearRosco(){
 function actualizarUI(){
   document.querySelectorAll(".letra").forEach(l=>l.classList.remove("activa"));
   document.getElementById("letra-"+actual).classList.add("activa");
-
-  document.getElementById("pregunta").innerText =
-    preguntas[actual].pregunta;
+  document.getElementById("pregunta").innerText=preguntas[actual].pregunta;
 }
 
 /* SIGUIENTE */
 function siguiente(){
+  let vueltas=0;
   do{
     actual=(actual+1)%preguntas.length;
-  }while(preguntas[actual].estado!==0);
+    vueltas++;
+  }while(preguntas[actual].estado!==0 && vueltas<preguntas.length);
 
   actualizarUI();
 }
 
 /* RESPONDER */
 document.getElementById("responderBtn").addEventListener("click", ()=>{
-  const input=document.getElementById("respuesta");
   const resp=input.value.toLowerCase().trim();
-
   if(!resp) return;
 
   const p=preguntas[actual];
@@ -178,9 +222,11 @@ document.getElementById("responderBtn").addEventListener("click", ()=>{
   if(resp===p.respuesta){
     letra.classList.add("correcta");
     p.estado=1;
+    vibrar(50);
   }else{
     letra.classList.add("incorrecta");
     p.estado=-1;
+    vibrar([100,50,100]);
   }
 
   input.value="";
@@ -194,10 +240,13 @@ document.getElementById("responderBtn").addEventListener("click", ()=>{
 });
 
 /* PASAR */
-document.getElementById("pasarBtn").addEventListener("click", siguiente);
+document.getElementById("pasarBtn").addEventListener("click", ()=>{
+  vibrar(30);
+  siguiente();
+});
 
 /* ENTER */
-document.getElementById("respuesta").addEventListener("keydown", (e)=>{
+input.addEventListener("keydown",(e)=>{
   if(e.key==="Enter"){
     e.preventDefault();
     document.getElementById("responderBtn").click();
@@ -208,7 +257,7 @@ document.getElementById("respuesta").addEventListener("keydown", (e)=>{
 function iniciarTimer(){
   intervalo=setInterval(()=>{
     tiempo--;
-    document.getElementById("timer").innerText="⏱ "+tiempo;
+    document.getElementById("timer").innerText="⏱ "+tiempo+"s";
 
     if(tiempo<=0) finalizar();
   },1000);
@@ -222,8 +271,16 @@ function finalizar(){
   let i=preguntas.filter(p=>p.estado===-1).length;
 
   document.getElementById("resultado").innerHTML =
-    `FIN<br>✅ ${c} | ❌ ${i}`;
+    `🏁 FIN<br>✅ ${c} | ❌ ${i}`;
+
+  vibrar([200,100,200]);
 }
+
+/* RESIZE (sin romper colores) */
+window.addEventListener("resize", ()=>{
+  clearTimeout(window._r);
+  window._r=setTimeout(crearRosco,200);
+});
 </script>
 
 </body>
