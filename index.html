@@ -191,15 +191,9 @@ function vibrar(ms){
 
 /* ROSCO */
 function crearRosco(){
-  const size = rosco.offsetWidth;
-
-  // 🚫 evitar dibujar si aún no tiene tamaño
-  if (!size || size < 100) return;
-
   rosco.innerHTML = "";
-
-  const radio = size / 2 - 25;
-  const centro = size / 2;
+  const radio = rosco.offsetWidth / 2 - 25;
+  const centro = rosco.offsetWidth / 2;
 
   preguntas.forEach((p, i) => {
     const angulo = (i / preguntas.length) * 2 * Math.PI - Math.PI/2;
@@ -219,7 +213,7 @@ function crearRosco(){
 
     rosco.appendChild(div);
   });
-
+}
 /* UI */
 function actualizarUI(){
   document.querySelectorAll(".letra").forEach(l => l.classList.remove("activa"));
